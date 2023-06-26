@@ -4,11 +4,10 @@ from datetime import datetime
 
 # Prototype to extract transactional data from Westpac transaction activity from web interface in csv file
 fileName = "test.txt"
-storage = "data.json"
+storage = "test.json"
 transData = []
 
-
-with open(storage, "w+") as store:
+with open(storage, "w") as store:
     with open(fileName) as file:
         # assign Transdate, transaction details, value, final cost, Date
 
@@ -30,17 +29,23 @@ with open(storage, "w+") as store:
             detail = (re.sub(r'[0-9][0-9]/[0-9][0-9]$', '', detail)).split()[3:]
 
             isExpense = True
-            if (convert[2][0] == '$'):
+            transVal = convert[2]
+            if (transVal[0] == '$'):
                 isExpense = False
+            else:
+                transVal = float(transVal[2:].replace(",", ""))
+
+            finalAmount = float(convert[3][1:].replace(",", ""))
 
             transDict = {
                 "transDate": transDate,
                 "date": date,
                 "detail": ' '.join(detail),
-                "transValue": convert[2],
-                "finAmount": convert[3],
+                "transValue": transVal,
+                "finAmount": finalAmount,
                 "isExpense": isExpense
             }
+            print(transDict)
 
             transData.append(transDict)
         jsonData = json.dumps(transData, indent=6)
