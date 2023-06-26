@@ -5,6 +5,9 @@ from datetime import datetime
 # Prototype to extract transactional data from Westpac transaction activity from web interface in csv file
 fileName = "test.txt"
 storage = "data.json"
+transData = []
+
+
 with open(storage, "w+") as store:
     with open(fileName) as file:
         # assign Transdate, transaction details, value, final cost, Date
@@ -39,7 +42,9 @@ with open(storage, "w+") as store:
                 "isExpense": isExpense
             }
 
-            
-            print(transDict)
+            transData.append(transDict)
+        jsonData = json.dumps(transData, indent=6)
+        store.write(jsonData)
+        # json.dump(transData, store)
 
     
