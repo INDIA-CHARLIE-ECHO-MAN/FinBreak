@@ -3,6 +3,10 @@ import json
 from datetime import datetime
 
 # Prototype to extract transactional data from Westpac transaction activity from web interface in csv file
+# input data from test.txt example below:
+# 22 Jun 2023		EFTPOS DEBIT 0046656 KEBAB DELIGHT NSW KENSINGTON 22/06Click for details	-$15.00		$1,790.57
+
+
 fileName = "test.txt"
 storage = "test.json"
 transData = []
