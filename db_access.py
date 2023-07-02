@@ -28,7 +28,7 @@ insertTrans = """ INSERT INTO transaction (
                     transDate, 
                     date, 
                     transVal, 
-                    isExpense) VALUES (%s, %s, %s, %s, %s, %s, %s));"""
+                    isExpense) VALUES (%s, %s, %s, %s, %s, %s, %s);"""
 cur.execute(createTrans)
 
 # insert data from json to transact table
@@ -41,14 +41,22 @@ with open(jsonLoc, 'r') as file:
         insertVal = (
                     trans['id'],
                     trans['finAmount'],
-                    trans['details'],
+                    trans['detail'],
                     trans['transDate'],
                     trans['date'],
-                    trans['transVal'],
+                    trans['transValue'],
                     trans['isExpense']
                     )
-
+        print(insertVal)
+        cur.execute(insertTrans, insertVal)
 # end
 conn.commit()
 cur.close()
 conn.close
+
+
+# values = [(14, 'Ian', 78), (15, 'John', 88), (16, 'Peter', 92)]
+ 
+# # cursor.mogrify() to insert multiple values
+# args = ','.join(cursor.mogrify("(%s,%s,%s)", i).decode('utf-8')
+#                 for i in values)

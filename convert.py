@@ -14,7 +14,7 @@ transData = []
 with open(storage, "w") as store:
     with open(fileName) as file:
         # assign Transdate, transaction details, value, final cost, Date
-
+        id = 1
         for line in file:
             convert = line.strip()
             convert = convert.split('\t')
@@ -29,9 +29,11 @@ with open(storage, "w") as store:
             if (date == []):
                 date = None
             else:
-                date = ''.join(date)
-            detail = (re.sub(r'[0-9][0-9]/[0-9][0-9]$', '', detail)).split()[3:]
+                date = ''.join(date).replace("/", "-")
+                # make date in transDate format
+                date = transDate[:5] + date[-2:] + date[2:-2] + date[:2]
 
+            detail = (re.sub(r'[0-9][0-9]/[0-9][0-9]$', '', detail)).split()[3:]
             isExpense = True
             transVal = convert[2]
             if (transVal[0] == '$'):
@@ -42,6 +44,7 @@ with open(storage, "w") as store:
             finalAmount = float(convert[3][1:].replace(",", ""))
 
             transDict = {
+                "id": id,
                 "transDate": transDate,
                 "date": date,
                 "detail": ' '.join(detail),
@@ -49,8 +52,8 @@ with open(storage, "w") as store:
                 "finAmount": finalAmount,
                 "isExpense": isExpense
             }
-            print(transDict)
-
+            #print(transDict)
+            id += 1
             transData.append(transDict)
         jsonData = json.dumps(transData, indent=6)
         store.write(jsonData)
