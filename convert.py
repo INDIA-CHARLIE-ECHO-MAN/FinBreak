@@ -6,7 +6,6 @@ from datetime import datetime
 # input data from test.txt example below:
 # 22 Jun 2023		EFTPOS DEBIT 0046656 KEBAB DELIGHT NSW KENSINGTON 22/06Click for details	-$15.00		$1,790.57
 
-
 fileName = "test.txt"
 storage = "test.json"
 transData = []
@@ -38,6 +37,7 @@ with open(storage, "w") as store:
             transVal = convert[2]
             if (transVal[0] == '$'):
                 isExpense = False
+                transVal = float(transVal[1:].replace(",", ""))
             else:
                 transVal = float(transVal[2:].replace(",", ""))
 
@@ -52,7 +52,6 @@ with open(storage, "w") as store:
                 "finAmount": finalAmount,
                 "isExpense": isExpense
             }
-            #print(transDict)
             id += 1
             transData.append(transDict)
         jsonData = json.dumps(transData, indent=6)

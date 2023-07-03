@@ -47,7 +47,7 @@ with open(jsonLoc, 'r') as file:
                     trans['transValue'],
                     trans['isExpense']
                     )
-        print(insertVal)
+        #print(insertVal)
         cur.execute(insertTrans, insertVal)
 # end
 conn.commit()
