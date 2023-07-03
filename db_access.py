@@ -12,6 +12,11 @@ conn = psycopg2.connect(
 cur = conn.cursor()
 
 # actions
+# Drop table script
+dropTrans = """
+            DROP TABLE transaction;
+            """
+
 # create transact table script
 createTrans = """ CREATE TABLE IF NOT EXISTS transaction (
                     id INT PRIMARY KEY,
