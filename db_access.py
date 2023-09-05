@@ -1,5 +1,6 @@
 import psycopg2
 import json
+import matplotlib.pyplot as plt
 
 with open('password.txt', 'r') as f:
     password = f.read()
@@ -69,7 +70,7 @@ def setup():
             cur.execute("SELECT * FROM transaction WHERE transDate = %s AND details = %s", (trans['transDate'], trans['detail']))
             result = cur.fetchall()
             if (len(result) == 0):
-                ### TODO: issue determine id of transaction before inserting, need to assign id at the convert.py part
+                ### TODO: unique id needs testing
 
                 cur.execute("SELECT if FROM transcation ORDER BY id DESC")
                 curId = cur.fetchone()
@@ -92,75 +93,39 @@ def setup():
     conn.close
 
 
+def plotProto():
 
-
-
-def main():
-    # reset()
-    setup()
-
-    # print('setup done')
     conn = connect()
     cur = conn.cursor()
 
-    # print('checking')
+    # Line plot of amount in account vs time (day, monthly, yearly)
+    # cur.execute("SELECT transDate, finAmount FROM transaction ORDER BY transDate ASC")
 
+    cur.execute("SELECT DATE_PART('year', transDate) as year FROM transaction")
+    result = cur.fetchall()
+    print(result)
+    # line plot based on month
+    # for res in result:
+        
+
+
+    # Line plot of transaction amount vs time (day, montly, yearly)
+    
+def printTable():
+    conn = connect()
+    cur = conn.cursor()
     cur.execute("""select * from transaction;""")
     for record in cur:
         print(record)
     cur.close()
-    conn.close
+    conn.close()
+
+def main():
+    # reset()
+    setup()
+    plotProto()
+    # printTable()
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
-
-# conn = psycopg2.connect(
-#     host="localhost",
-#     dbname="transact",
-#     user="postgres",
-#     password=password,
-#     port=5432
-# )
-# # start
-# cur = conn.cursor()
-
-
-# cur.execute(createTrans)
-
-# # insert data from json to transact table
-# jsonLoc = "test.json"
-# with open(jsonLoc, 'r') as file:
-#     data = json.load(file)
-#     for trans in data:
-
-#         ### TODO: issue determine id of transaction before inserting, need to assign id at the convert.py part
-#         insertVal = (
-#                     trans['id'],
-#                     trans['finAmount'],
-#                     trans['detail'],
-#                     trans['transDate'],
-#                     trans['date'],
-#                     trans['transValue'],
-#                     trans['isExpense']
-#                     )
-#         #print(insertVal)
-#         cur.execute(insertTrans, insertVal)
-# # end
-# conn.commit()
-# cur.close()
-# conn.close
-
-
-# values = [(14, 'Ian', 78), (15, 'John', 88), (16, 'Peter', 92)]
- 
-# # cursor.mogrify() to insert multiple values
-# args = ','.join(cursor.mogrify("(%s,%s,%s)", i).decode('utf-8')
-#                 for i in values)
 
