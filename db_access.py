@@ -22,43 +22,58 @@ createTrans = """ CREATE TABLE IF NOT EXISTS transaction (
                     isExpense BOOL); """
 
 # insert transact table script
-insertTrans = """ INSERT INTO transaction (
-                    id, 
-                    finAmount, 
-                    details, 
-                    transDate, 
-                    date, 
-                    transVal, 
-                    isExpense) VALUES (%s, %s, %s, %s, %s, %s, %s);"""
+insertTrans = """ 
+    INSERT INTO transaction (
+    id, 
+    finAmount, 
+    details, 
+    transDate, 
+    date, 
+    transVal, 
+    isExpense) VALUES (%s, %s, %s, %s, %s, %s, %s);"""
 
 # get latest finAmount of each month
-getAmountMonthFunc = """    CREATE OR REPLACE FUNCTION get_amount_month()
-                        RETURNS TABLE (
-                            id INT,
-                            transDate date,
-                            finAmount float
-                        )
-                        AS $$
-                        DECLARE
-                            result_row record;
-                        BEGIN
-                            FOR counter IN 1..12 LOOP
-                                SELECT *
-                                FROM transaction t
-                                WHERE DATE_PART('month', t.transDate) = counter
-                                ORDER BY t.transDate DESC, id 
-                                LIMIT 1
-                                INTO result_row;
-                                
-                                IF FOUND THEN
-                                    -- Return the result_row
-                                    RETURN query select result_row.id, result_row.transDate, result_row.finAmount;
-                                END IF;
-                            END LOOP;
-                            
-                            RETURN;
-                        END;
-                        $$ LANGUAGE plpgsql;    """
+getAmountMonthFunc = """    
+    CREATE OR REPLACE FUNCTION get_amount_month()
+    RETURNS TABLE (
+        id INT,
+        transDate date,
+        finAmount float
+    )
+    AS $$
+    DECLARE
+        result_row record;
+        year_row int;
+    BEGIN
+        FOR year_row in select distinct DATE_PART('year', t.transDate) as year 
+            from transaction t
+            order by year 
+            
+        LOOP
+            raise notice 'year: %', year_row;
+            
+                FOR counter IN 1..12 LOOP
+                SELECT *
+                FROM transaction t
+                WHERE DATE_PART('month', t.transDate) = counter and DATE_PART('year', t.transDate) = year_row
+                ORDER BY t.transDate DESC, id 
+                LIMIT 1
+                INTO result_row;
+
+                IF FOUND THEN
+                    -- Return the result_row
+                    RETURN query select result_row.id, result_row.transDate, result_row.finAmount;
+                END IF;
+                END LOOP;
+            
+        END LOOP;
+        /*
+
+        */
+        RETURN;
+    END;
+    $$ LANGUAGE plpgsql;
+"""
 
 # connect psycopg2
 def connect():
@@ -136,7 +151,6 @@ def setup():
 
 
 def plotProto():
-
     conn = connect()
     cur = conn.cursor()
 
@@ -149,9 +163,22 @@ def plotProto():
     cur.execute(getAmountMonth)
 
     result = cur.fetchall()
-    print(result)
+
+    # holds data separated by year, containing month and amount value
+    records = {}
+
     for res in result:
-        print(res[2])
+        records[res[1].year] = []
+
+
+    for res in result:
+        print(res)
+        val = {}
+        val[res[1].month] = res[2]
+        records[res[1].year].append(val)
+        
+        
+    print(records)
     # print(type(result))
     # for res in result:
     #     print(int(res[0]))
