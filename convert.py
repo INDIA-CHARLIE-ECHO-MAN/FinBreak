@@ -6,7 +6,8 @@ from datetime import datetime
 # input data from test.txt example below:
 # 22 Jun 2023		EFTPOS DEBIT 0046656 KEBAB DELIGHT NSW KENSINGTON 22/06Click for details	-$15.00		$1,790.57
 
-fileName = "test.txt"
+# fileName = "test.txt"
+fileName = "1.txt"
 storage = "test.json"
 transData = []
 
