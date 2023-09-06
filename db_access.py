@@ -1,6 +1,8 @@
 import psycopg2
 import json
 import matplotlib.pyplot as plt
+import calendar
+import datetime
 
 with open('password.txt', 'r') as f:
     password = f.read()
@@ -172,18 +174,32 @@ def plotProto():
 
 
     for res in result:
-        print(res)
         val = {}
         val[res[1].month] = res[2]
         records[res[1].year].append(val)
         
         
-    print(records)
-    # print(type(result))
-    # for res in result:
-    #     print(int(res[0]))
-    # line plot based on month
-    # for res in result:
+    # print(records)
+
+    # line plot of amount monthly in current year
+    curYear = datetime.date.today().year
+    x = []
+    y = []
+
+    # print(records[curYear])
+    for rec in records[curYear]:
+        for r in rec:
+            x.append(calendar.month_abbr[r])
+            y.append(rec[r])
+    # print(x)
+    # print(y)
+    plt.rcParams['figure.figsize'] = [10, 10]
+    plt.plot(x,y)
+    plt.xlabel('Months', fontweight='bold', fontsize='12', labelpad=15)
+    plt.ylabel('Amount in account ($)', fontweight='bold', fontsize='12', labelpad=15)
+    plt.title('Amount in account during ' + str(curYear), fontweight='bold', fontsize='15', pad=15)
+    plt.savefig('test.png')
+
         
 
 
