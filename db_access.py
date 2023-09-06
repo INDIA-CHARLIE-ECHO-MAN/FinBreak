@@ -152,7 +152,7 @@ def setup():
     conn.close
 
 
-def plotProto():
+def plotProto(startYear, endYear):
     conn = connect()
     cur = conn.cursor()
 
