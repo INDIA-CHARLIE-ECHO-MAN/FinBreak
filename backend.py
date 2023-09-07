@@ -213,28 +213,40 @@ def reset():
     cur.close()
     conn.close
 
-def plotProto(plotName, accName, startYear, endYear = None):
+def plotProto(plotName, accNames, startYear, endYear = None):
     conn = connect()
     cur = conn.cursor()
-    # Line plot of amount in account vs time (day, monthly, yearly)
-    # cur.execute("SELECT transDate, finAmount FROM transaction ORDER BY transDate ASC")
-    getAmountMonth = "SELECT * FROM get_amount_month(" +"'" + accName + "'" +");"
-    cur.execute(getAmountMonth)
-
-    result = cur.fetchall()
-
-    # holds data separated by year, containing month and amount value
     records = {}
 
-    for res in result:
-        records[res[1].year] = []
+    for accName in accNames:
+        getAmountMonth = "SELECT * FROM get_amount_month(" +"'" + accName + "'" +");"
+        cur.execute(getAmountMonth)
+        result = cur.fetchall()
+        # print(result)
 
+    # holds data separated by year, containing month and amount value
+        # setup dictionary if empty
+        if len(records) == 0:
+            for res in result:
+                records[res[1].year] = {}
+    
+        for res in result:
+            # get year, month and val
+            year = res[1].year
+            month = res[1].month
+            val = res[2]
 
-    for res in result:
-        val = {}
-        val[res[1].month] = res[2]
-        records[res[1].year].append(val)
-        
+            # check if month exists in that year
+            if month in records[year]:
+                
+                # adds the old amount onto the new record
+                oldAmount = records[year][month]
+                # print(oldAmount)
+                val = oldAmount + val
+
+            # insert the new record
+            records[year][month] = val
+
     x = []
     y = []
 
@@ -243,36 +255,60 @@ def plotProto(plotName, accName, startYear, endYear = None):
     if endYear == None:
 
         # access month and amount in that year
-        for rec in records[startYear]:
-            for r in rec:
-                x.append(calendar.month_abbr[r])
-                y.append(rec[r])
+        for month in records[startYear]:
+            x.append(calendar.month_abbr[month])
+            y.append(records[startYear][month])
 
         plt.figure(figsize=(10,10))
         plt.plot(x,y)
         plt.xlabel('Months', fontweight='bold', fontsize='12', labelpad=15)
-        # plt.ylabel('Amount in account ($)', fontweight='bold', fontsize='12', labelpad=15)
-        plt.title('Amount in ' + accName + ' during ' + str(startYear), fontweight='bold', fontsize='15', pad=15)
 
+        # account for multiple accounts
+        if len(accNames) > 1:
+            plt.title('Amount in ' + ', '.join(accNames) + ' during ' + str(startYear), fontweight='bold', fontsize='15', pad=15)
+        else:
+            plt.title('Amount in ' + accName + ' during ' + str(startYear), fontweight='bold', fontsize='15', pad=15)
 
     # take range of years
     else:
         # access month and amount in the range of years
         year = startYear
         while year <= endYear:
-            for rec in records[year]:
-                for r in rec:
-                    x.append(str(year) + '/' + str(calendar.month_abbr[r])) 
-                    y.append(rec[r])
+
+            # loop through months in each year
+            for month in records[year]:
+                x.append(str(year) + '/' + str(calendar.month_abbr[month])) 
+                y.append(records[year][month])
             year += 1
 
-        # plt.rcParams['figure.figsize'] = [40, 10]
         plt.figure(figsize=(10 * (endYear - startYear + 1), 10))
         plt.plot(x,y)
         plt.xlabel('Year/Month', fontweight='bold', fontsize='12', labelpad=15)
-        plt.title('Amount in ' + accName + ' between ' + str(startYear) + ' and ' + str(endYear), fontweight='bold', fontsize='15', pad=15)
 
-    plt.ylabel('Amount in ' + accName + ' ($)', fontweight='bold', fontsize='12', labelpad=15)
+        # account for multiple accounts
+        if len(accNames) > 1:
+            plt.title('Amount in ' + ', '.join(accNames) + ' between ' + str(startYear) + ' and ' + str(endYear), fontweight='bold', fontsize='15', pad=15)
+        else:
+            plt.title('Amount in ' + accName + ' between ' + str(startYear) + ' and ' + str(endYear), fontweight='bold', fontsize='15', pad=15)
+
+        # plt.title('Amount in ' + accName + ' between ' + str(startYear) + ' and ' + str(endYear), fontweight='bold', fontsize='15', pad=15)
+
+    # y axes account for multiple accounts
+    if len(accNames) > 1:
+        plt.ylabel('Amount in ' + ', '.join(accNames) + ' ($)', fontweight='bold', fontsize='12', labelpad=15)
+    else: 
+        plt.ylabel('Amount in ' + accName + ' ($)', fontweight='bold', fontsize='12', labelpad=15)
+
+    # annotate the data points
+    for x,y in zip(x,y):
+        plt.annotate(
+            f"{round(y, 2)}",
+            (x,y),
+            textcoords="offset points",
+            xytext=(0,10),
+            ha='center'
+        )
+
     plt.savefig(plotName)
     plt.clf()
 
@@ -292,15 +328,20 @@ def main():
     setup('1.txt', 'acc1')
     setup('2.txt', 'acc2')
 
-    plotProto('2020-2023 acc1', 'acc1', 2020, 2023)
-    plotProto('2020-2021 acc1', 'acc1', 2020, 2021)
-    plotProto('2020 acc1', 'acc1', 2020)
-    plotProto('2023 acc1', 'acc1', 2023)
+    plotProto('2020-2023 acc1', ['acc1'], 2020, 2023)
+    plotProto('2020-2021 acc1', ['acc1'], 2020, 2021)
+    plotProto('2020 acc1', ['acc1'], 2020)
+    plotProto('2023 acc1', ['acc1'], 2023)
 
-    plotProto('2020-2023 acc2', 'acc2', 2020, 2023)
-    plotProto('2020-2021 acc2', 'acc2', 2020, 2021)
-    plotProto('2020 acc2', 'acc2', 2020)
-    plotProto('2023 acc2', 'acc2', 2023)
+    plotProto('2020-2023 acc2', ['acc2'], 2020, 2023)
+    plotProto('2020-2021 acc2', ['acc2'], 2020, 2021)
+    plotProto('2020 acc2', ['acc2'], 2020)
+    plotProto('2023 acc2', ['acc2'], 2023)
+
+    plotProto('2020-2023 acc1+2', ['acc1', 'acc2'], 2020, 2023)
+    plotProto('2020-2021 acc1+2', ['acc1', 'acc2'], 2020, 2021)
+    plotProto('2020 acc1+2', ['acc1', 'acc2'], 2020)
+    plotProto('2023 acc1+2', ['acc1', 'acc2'], 2023)
 
 if __name__ == "__main__":
     main()
