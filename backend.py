@@ -291,8 +291,6 @@ def plotProto(plotName, accNames, startYear, endYear = None):
         else:
             plt.title('Amount in ' + accName + ' between ' + str(startYear) + ' and ' + str(endYear), fontweight='bold', fontsize='15', pad=15)
 
-        # plt.title('Amount in ' + accName + ' between ' + str(startYear) + ' and ' + str(endYear), fontweight='bold', fontsize='15', pad=15)
-
     # y axes account for multiple accounts
     if len(accNames) > 1:
         plt.ylabel('Amount in ' + ', '.join(accNames) + ' ($)', fontweight='bold', fontsize='12', labelpad=15)
