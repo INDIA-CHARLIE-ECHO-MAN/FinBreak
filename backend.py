@@ -113,7 +113,9 @@ def convert(fileName, accName):
 
                 detail = (re.sub(r'[0-9][0-9]/[0-9][0-9]$', '', detail)).split()[3:]
                 isExpense = True
-                transVal = convert[2]
+                # transVal = convert[2]
+                transVal = re.sub('minus-', '', convert[2])
+
                 if (transVal[0] == '$'):
                     isExpense = False
                     transVal = float(transVal[1:].replace(",", ""))
@@ -324,22 +326,23 @@ def printTable():
 def main():
     reset()
     setup('1.txt', 'acc1')
-    setup('2.txt', 'acc2')
+    plotProto('2022-2023 acc1 show', ['acc1'], 2022, 2023)
+    # setup('2.txt', 'acc2')s
 
-    plotProto('2020-2023 acc1', ['acc1'], 2020, 2023)
-    plotProto('2020-2021 acc1', ['acc1'], 2020, 2021)
-    plotProto('2020 acc1', ['acc1'], 2020)
-    plotProto('2023 acc1', ['acc1'], 2023)
+    # plotProto('2020-2023 acc1', ['acc1'], 2020, 2023)
+    # plotProto('2020-2021 acc1', ['acc1'], 2020, 2021)
+    # plotProto('2020 acc1', ['acc1'], 2020)
+    # plotProto('2023 acc1', ['acc1'], 2023)
 
-    plotProto('2020-2023 acc2', ['acc2'], 2020, 2023)
-    plotProto('2020-2021 acc2', ['acc2'], 2020, 2021)
-    plotProto('2020 acc2', ['acc2'], 2020)
-    plotProto('2023 acc2', ['acc2'], 2023)
+    # plotProto('2020-2023 acc2', ['acc2'], 2020, 2023)
+    # plotProto('2020-2021 acc2', ['acc2'], 2020, 2021)
+    # plotProto('2020 acc2', ['acc2'], 2020)
+    # plotProto('2023 acc2', ['acc2'], 2023)
 
-    plotProto('2020-2023 acc1+2', ['acc1', 'acc2'], 2020, 2023)
-    plotProto('2020-2021 acc1+2', ['acc1', 'acc2'], 2020, 2021)
-    plotProto('2020 acc1+2', ['acc1', 'acc2'], 2020)
-    plotProto('2023 acc1+2', ['acc1', 'acc2'], 2023)
+    # plotProto('2020-2023 acc1+2', ['acc1', 'acc2'], 2020, 2023)
+    # plotProto('2020-2021 acc1+2', ['acc1', 'acc2'], 2020, 2021)
+    # plotProto('2020 acc1+2', ['acc1', 'acc2'], 2020)
+    # plotProto('2023 acc1+2', ['acc1', 'acc2'], 2023)
 
 if __name__ == "__main__":
     main()
